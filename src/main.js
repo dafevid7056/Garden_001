@@ -13,6 +13,11 @@ import { postprocessing } from './postprocessings.js'
 let modelFlag = false
 let composer
 
+/* ------------------------------ VIDEO TEXTURE ----------------------------- */
+const video = document.getElementById('video');
+const videoTexture = new THREE.VideoTexture(video);
+videoTexture.colorSpace = THREE.SRGBColorSpace;
+
 /* -------------------------------------------------------------------------- */
 /*                               GARDEN OBJECTS                               */
 /* -------------------------------------------------------------------------- */
@@ -186,18 +191,20 @@ function animate() {
 }
 
 /* -------------------------------------------------------------------------- */
-/*    Function for interactions with the garden objects: scale and position   */
+/*    Function for interactions with the garden objects: video texture, scale and position   */
 /* -------------------------------------------------------------------------- */
 
 function interactions() {
-  meshes.Tsukubai.addEventListener('mouseover', () => {
+  // Check if the object exists yet
+  if (!meshes.Tsukubai) return;
+
+  meshes.Tsukubai.addEventListener('mouseover', (event) => {
     gsap.to(meshes.Tsukubai.scale, {
-      x: meshes.Tsukubai.scale.x * 1.1,
-      y: meshes.Tsukubai.scale.y * 1.1,
-      z: meshes.Tsukubai.scale.z * 1.1,
+      x: 1.1, y: 1.1, z: 1.1,
       duration: 0.75,
       ease: 'bounce',
     })
+    
     gsap.to(meshes.Tsukubai.position,
       {
         x: meshes.Tsukubai.position.x,
@@ -207,15 +214,30 @@ function interactions() {
         ease: 'bounce',
       }
     )
+    // Video Swap
+    meshes.Tsukubai.traverse((child) => {
+      if (child.isMesh) {
+        // Store the original texture to switch back on mouseout
+        if (!child.userData.originalMap) {
+          child.userData.originalMap = child.material.map;
+        }
+
+        child.material.map = videoTexture;
+        child.material.needsUpdate = true;
+      }
+    });
+    // Start the video when hovered
+    video.play();
   })
+
   meshes.Tsukubai.addEventListener('mouseout', () => {
+    // Return Scale
     gsap.to(meshes.Tsukubai.scale, {
-      x: meshes.Tsukubai.scale.x / 1.1,
-      y: meshes.Tsukubai.scale.y / 1.1,
-      z: meshes.Tsukubai.scale.z / 1.1,
+      x: 1, y: 1, z: 1,
       duration: 0.75,
       ease: 'bounce',
     })
+
     gsap.to(meshes.Tsukubai.position,
       {
         x: meshes.Tsukubai.position.x,
@@ -225,7 +247,17 @@ function interactions() {
         ease: 'bounce',
       }
     )
+    // Return to Original Texture
+    meshes.Tsukubai.traverse((child) => {
+      if (child.isMesh && child.userData.originalMap !== undefined) {
+        child.material.map = child.userData.originalMap;
+        child.material.needsUpdate = true;
+      }
+    });
+
+    // Optional: video.pause(); 
   })
+
   interactionManager.add(meshes.Tsukubai)
 }
 

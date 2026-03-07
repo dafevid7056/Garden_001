@@ -42,6 +42,13 @@ h1 {
   text-align: center;
 }
 
+#video {
+    opacity: 0;
+    position: absolute;
+    pointer-events: none;
+    z-index: -1;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;
