@@ -41,14 +41,7 @@ const gardenObjects = [
   { name: 'Rock_1', url: './Rock_1.glb' },
   { name: 'Rock_2', url: './Rock_2.glb' },
   { name: 'Roof', url: './Roof.glb' },
-  { name: 'Shrubs_Group_1A', url: './Shrubs_Group_1A.glb' },
-  { name: 'Shrubs_Group_1B', url: './Shrubs_Group_1B.glb' },
-  { name: 'Shrubs_Group_1C', url: './Shrubs_Group_1C.glb' },
-  { name: 'Shrubs_Group_1D', url: './Shrubs_Group_1D.glb' },
-  { name: 'Shrubs_Group_1E', url: './Shrubs_Group_1E.glb' },
-  { name: 'Shrubs_Group_2A', url: './Shrubs_Group_2A.glb' },
-  { name: 'Shrubs_Group_2B', url: './Shrubs_Group_2B.glb' },
-  { name: 'Shrubs_Group_2C', url: './Shrubs_Group_2C.glb' },
+  { name: 'Shrubs_Group_1A', url: './Shrubs.glb' },
   { name: 'Stepping_stones_1', url: './Stepping_stones_1.glb' },
   { name: 'Stepping_stones_2', url: './Stepping_stones_2.glb' },
   { name: 'Stepping_stones_3', url: './Stepping_stones_3.glb' },
@@ -62,7 +55,6 @@ const gardenObjects = [
   { name: 'Vegetacion', url: './Vegetacion.glb' },
   { name: 'Vertical_rock_1', url: './Vertical_rock_1.glb' },
   { name: 'Vertical_rock_2', url: './Vertical_rock_2.glb' },
-  { name: 'Vertical_rock_3', url: './Vertical_rock_3.glb' },
   { name: 'Vidrio', url: './Vidrio.glb' },
   { name: 'Wall_1', url: './Wall_1.glb' },
   { name: 'Wall_2', url: './Wall_2.glb' },
@@ -100,12 +92,12 @@ const interactionManager = new InteractionManager(
 const controls = new OrbitControls(camera, renderer.domElement)
 controls.enableDamping = true
 controls.dampingFactor = 0.8
-controls.minPolarAngle = Math.PI / 3
-controls.maxPolarAngle = Math.PI / 2
-controls.minAzimuthAngle = -Math.PI / 16
-controls.maxAzimuthAngle = Math.PI / 10
-controls.minDistance = 3
-controls.maxDistance = 6
+// controls.minPolarAngle = Math.PI / 3
+// controls.maxPolarAngle = Math.PI / 2
+// controls.minAzimuthAngle = -Math.PI / 16
+// controls.maxAzimuthAngle = Math.PI / 10
+// controls.minDistance = 0 // (4)
+// controls.maxDistance = 6
 
 const meshes = {}
 const lights = {}
@@ -137,7 +129,7 @@ function instances() {
       meshes: meshes,
       scale: new THREE.Vector3(1, 1, 1),
       position: new THREE.Vector3(0, 0, 0),
-      replace: true
+      // replace: true
     })
     model.init()
   })
@@ -179,8 +171,8 @@ function resize() {
 
 function animate() {
   requestAnimationFrame(animate)
-  // renderer.render(scene, camera)
-  composer.render()
+  renderer.render(scene, camera)
+  // composer.render()
   controls.update()
   interactionManager.update()
 
