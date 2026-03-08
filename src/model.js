@@ -9,6 +9,8 @@ import {
 	PointsMaterial,
 	Points,
 	MeshMatcapMaterial,
+	MeshPhongMaterial,
+	MeshLambertMaterial,
 	TextureLoader,
 	Vector3,
 	BufferGeometry,
@@ -58,23 +60,49 @@ export default class Model {
 			new Color('#A73489'),
 		]
 		this.callback = obj.callback
+		this.materialType = obj.materialType || 'packed'
+		this.color = obj.color || 0xffffff
 	}
 	init() {
 		//the meat and bones of the file, we load our models using our gltf loader
 		this.loader.load(this.file, (gltf) => {
 			this.mesh = gltf.scene.children[0]
-			//if we set replace to true then we try to look through every element in our obj and change anything that's a material to our new material
-			if (this.replaceMaterials) {
-				const replacementMaterial = new MeshMatcapMaterial({
-					matcap: this.defaultMatcap,
+			console.log(this.name, '| materialType:', this.materialType, '| color:', this.color)
+
+			let replacementMaterial
+
+			if (this.materialType === 'matcap') {
+				replacementMaterial = new MeshMatcapMaterial({ matcap: this.defaultMatcap })
+
+			} else if (this.materialType === 'phong') {
+				replacementMaterial = new MeshPhongMaterial({
+					color: this.color,
+					specular: 0x111111,
+					emissive: this.color,
+					emissiveIntensity: 0.15,
+					shininess: 8,
 				})
-				//intuitive naming, we traverse through every element and for each check if it's a mesh, if it's a mesh it must have a material and we sub it out for our new material
-				gltf.scene.traverse((child) => {
-					if (child.isMesh) {
-						child.material = replacementMaterial
-					}
+
+			} else if (this.materialType === 'lambert') {
+				replacementMaterial = new MeshLambertMaterial({ color: this.color })
+
+			} else if (this.materialType === 'glass') {
+				replacementMaterial = new MeshPhongMaterial({
+					color: 0xffffff,
+					specular: 0xaaaaaa,
+					shininess: 120,
+					transparent: true,
+					opacity: 0.4,
+					depthWrite: false,
 				})
 			}
+
+			if (replacementMaterial) {
+				gltf.scene.traverse((child) => {
+					if (child.isMesh) child.material = replacementMaterial
+				})
+			}
+			// if materialType === 'packed', do nothing — Blender material is used as-is
 
 			//if animations is set to true we load all the animations saved in the model to our animation mixer so we can manipulate them outside this class
 			if (this.animations) {

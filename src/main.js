@@ -9,6 +9,7 @@ import { OrbitControls } from 'three/examples/jsm/Addons.js'
 import { InteractionManager } from 'three.interactive'
 import gsap from 'gsap'
 import { postprocessing } from './postprocessings.js'
+import { environment } from './environment.js'
 
 let modelFlag = false
 let composer
@@ -23,48 +24,38 @@ videoTexture.colorSpace = THREE.SRGBColorSpace;
 /* -------------------------------------------------------------------------- */
 
 const gardenObjects = [
-  { name: 'Column_1', url: './Column_1.glb' },
-  { name: 'Column_2', url: './Column_2.glb' },
-  { name: 'Garden', url: './Garden.glb' },
-  { name: 'Glass_1', url: './Glass_1.glb' },
-  { name: 'Glass_2', url: './Glass_2.glb' },
-  { name: 'Gravel_floor_1', url: './Gravel_floor_1.glb' },
-  { name: 'Gravel_floor_2', url: './Gravel_floor_2.glb' },
-  { name: 'Lamp', url: './Lamp.glb' },
-  { name: 'Lampara', url: './Lampara.glb' },
-  { name: 'Madera', url: './Madera.glb' },
-  { name: 'Muros', url: './Muros.glb' },
-  { name: 'Piedras', url: './Piedras.glb' },
-  { name: 'Piso_Gravilla', url: './Piso_Gravilla.glb' },
-  { name: 'Piso_Madera', url: './Piso_Madera.glb' },
-  { name: 'Piso_Piedras', url: './Piso_Piedras.glb' },
-  { name: 'Rock_1', url: './Rock_1.glb' },
-  { name: 'Rock_2', url: './Rock_2.glb' },
-  { name: 'Roof', url: './Roof.glb' },
-  { name: 'Shrubs_Group_1A', url: './Shrubs.glb' },
-  { name: 'Stepping_stones_1', url: './Stepping_stones_1.glb' },
-  { name: 'Stepping_stones_2', url: './Stepping_stones_2.glb' },
-  { name: 'Stepping_stones_3', url: './Stepping_stones_3.glb' },
-  { name: 'Stepping_stones_4', url: './Stepping_stones_4.glb' },
-  { name: 'Stepping_stones_5', url: './Stepping_stones_5.glb' },
-  { name: 'Stepping_stones_6', url: './Stepping_stones_6.glb' },
-  { name: 'Techo', url: './Techo.glb' },
-  { name: 'Three_front', url: './Three_front.glb' },
-  { name: 'Tree_back', url: './Tree_back.glb' },
-  { name: 'Tsukubai', url: './Tsukubai.glb' },
-  { name: 'Vegetacion', url: './Vegetacion.glb' },
-  { name: 'Vertical_rock_1', url: './Vertical_rock_1.glb' },
-  { name: 'Vertical_rock_2', url: './Vertical_rock_2.glb' },
-  { name: 'Vidrio', url: './Vidrio.glb' },
-  { name: 'Wall_1', url: './Wall_1.glb' },
-  { name: 'Wall_2', url: './Wall_2.glb' },
-  { name: 'Wall_3', url: './Wall_3.glb' },
-  { name: 'Wall_4', url: './Wall_4.glb' },
-  { name: 'Wall_5', url: './Wall_5.glb' },
-  { name: 'Window_1', url: './Window_1.glb' },
-  { name: 'Wooden_beam', url: './Wooden_beam.glb' },
-  { name: 'Wooden_floor', url: './Wooden_floor.glb' },
-  { name: 'Wooden_gate', url: './Wooden_gate.glb' }
+  { name: 'Butterfly', url: './butterfly.glb', materialType: 'packed' },
+  { name: 'Column_1', url: './Column_1.glb', materialType: 'phong', color: 0xFEF6EC },
+  { name: 'Column_2', url: './Column_2.glb', materialType: 'phong', color: 0xFEF6EC },
+  { name: 'Glass_1', url: './Glass_1.glb', materialType: 'glass' },
+  { name: 'Glass_2', url: './Glass_2.glb', materialType: 'glass' },
+  { name: 'Gravel_floor_1', url: './Gravel_floor_1.glb', materialType: 'phong', color: 0xdad7cd },
+  { name: 'Gravel_floor_2', url: './Gravel_floor_2.glb', materialType: 'phong', color: 0xedede9 },
+  { name: 'Lamp', url: './Lamp.glb', materialType: 'packed' },
+  { name: 'Rock_1', url: './Rock_1.glb', materialType: 'packed' },
+  { name: 'Rock_2', url: './Rock_2.glb', materialType: 'packed' },
+  { name: 'Roof', url: './Roof.glb', materialType: 'phong', color: 0xF9E5DC },
+  { name: 'Shrubs_Group_1A', url: './Shrubs.glb', materialType: 'packed' },
+  { name: 'Stepping_stones_1', url: './Stepping_stones_1.glb', materialType: 'packed' },
+  { name: 'Stepping_stones_2', url: './Stepping_stones_2.glb', materialType: 'packed' },
+  { name: 'Stepping_stones_3', url: './Stepping_stones_3.glb', materialType: 'packed' },
+  { name: 'Stepping_stones_4', url: './Stepping_stones_4.glb', materialType: 'packed' },
+  { name: 'Stepping_stones_5', url: './Stepping_stones_5.glb', materialType: 'packed' },
+  { name: 'Stepping_stones_6', url: './Stepping_stones_6.glb', materialType: 'packed' },
+  { name: 'Three_front', url: './Three_front.glb', materialType: 'packed' },
+  { name: 'Tree_back', url: './Tree_back.glb', materialType: 'packed' },
+  { name: 'Tsukubai', url: './Tsukubai.glb', materialType: 'packed' },
+  { name: 'Vertical_rock_1', url: './Vertical_rock_1.glb', materialType: 'packed' },
+  { name: 'Vertical_rock_2', url: './Vertical_rock_2.glb', materialType: 'packed' },
+  { name: 'Wall_1', url: './Wall_1.glb', materialType: 'phong', color: 0xFEF6EC },
+  { name: 'Wall_2', url: './Wall_2.glb', materialType: 'phong', color: 0xFEF6EC },
+  { name: 'Wall_3', url: './Wall_3.glb', materialType: 'phong', color: 0xFEF6EC },
+  { name: 'Wall_4', url: './Wall_4.glb', materialType: 'phong', color: 0xFEF6EC },
+  { name: 'Wall_5', url: './Wall_5.glb', materialType: 'phong', color: 0xFEF6EC },
+  { name: 'Window_1', url: './Window_1.glb', materialType: 'phong', color: 0xF9E5DC },
+  { name: 'Wooden_beam', url: './Wooden_beam.glb', materialType: 'phong', color: 0xF9E5DC },
+  { name: 'Wooden_floor', url: './Wooden_floor.glb', materialType: 'phong', color: 0xF9E5DC },
+  { name: 'Wooden_gate', url: './Wooden_gate.glb', materialType: 'phong', color: 0xF9E5DC },
 ];
 
 const scene = new THREE.Scene()
@@ -92,15 +83,17 @@ const interactionManager = new InteractionManager(
 const controls = new OrbitControls(camera, renderer.domElement)
 controls.enableDamping = true
 controls.dampingFactor = 0.8
-// controls.minPolarAngle = Math.PI / 3
-// controls.maxPolarAngle = Math.PI / 2
-// controls.minAzimuthAngle = -Math.PI / 16
-// controls.maxAzimuthAngle = Math.PI / 10
-// controls.minDistance = 0 // (4)
-// controls.maxDistance = 6
+controls.minPolarAngle = Math.PI / 2.8
+controls.maxPolarAngle = Math.PI / 2
+controls.minAzimuthAngle = -Math.PI / 18
+controls.maxAzimuthAngle = Math.PI / 10
+controls.minDistance = 4
+controls.maxDistance = 7
 
 const meshes = {}
-const lights = {}
+const mixers = []
+// const lights = {}
+const clock = new THREE.Clock()
 
 init()
 
@@ -111,9 +104,16 @@ function init() {
 
   composer = postprocessing(scene, camera, renderer)
 
-  lights.default = addLights()
-  scene.add(lights.default)
+  // lights.default = addLights()
+  // scene.add(lights.default)
+
+  addLights(scene)
+
   console.log(meshes)
+
+  scene.background = environment()
+  scene.environment = environment()
+  scene.environment.intensity = 2.0
 
   instances()
   resize()
@@ -129,6 +129,10 @@ function instances() {
       meshes: meshes,
       scale: new THREE.Vector3(1, 1, 1),
       position: new THREE.Vector3(0, 0, 0),
+      materialType: obj.materialType || 'matcap',
+      color: obj.color || 0xffffff,
+      animationState: true,
+      mixers: mixers,
       // replace: true
     })
     model.init()
@@ -155,8 +159,10 @@ window.addEventListener('keydown', (event) => {
       camera.lookAt(cameraTarget)
       controls.minAzimuthAngle = -Math.PI / 18
       controls.maxAzimuthAngle = Math.PI / 10
-      controls.minDistance = 3
-      controls.maxDistance = 6
+      controls.minPolarAngle = Math.PI / 2.8
+      controls.maxPolarAngle = Math.PI / 2
+      controls.minDistance = 4
+      controls.maxDistance = 7
       break;
   }
 });
@@ -170,6 +176,10 @@ function resize() {
 }
 
 function animate() {
+  const delta = clock.getDelta()
+  for (const mixer of mixers) {
+    mixer.update(delta)
+  }
   requestAnimationFrame(animate)
   renderer.render(scene, camera)
   // composer.render()
@@ -187,69 +197,70 @@ function animate() {
 /* -------------------------------------------------------------------------- */
 
 function interactions() {
-  // Check if the object exists yet
-  if (!meshes.Tsukubai) return;
+  const interactiveNames = ['Tsukubai', 'Stepping_stones_1', 'Vertical_rock_2', 'Lamp'];
 
-  meshes.Tsukubai.addEventListener('mouseover', (event) => {
-    gsap.to(meshes.Tsukubai.scale, {
-      x: 1.1, y: 1.1, z: 1.1,
-      duration: 0.75,
-      ease: 'bounce',
-    })
-    
-    gsap.to(meshes.Tsukubai.position,
-      {
-        x: meshes.Tsukubai.position.x,
-        y: meshes.Tsukubai.position.y + 0.2,
-        z: meshes.Tsukubai.position.z,
+  interactiveNames.forEach((name) => {
+    const target = meshes[name];
+
+    // Check if the object exists in the meshes object
+    if (!target) {
+      console.warn(`Mesh ${name} not found yet.`);
+      return;
+    }
+
+    // Capture the initial position
+    const initialY = target.position.y;
+
+    target.addEventListener('mouseover', (event) => {
+      gsap.to(target.scale, {
+        x: 1.1, y: 1.1, z: 1.1,
         duration: 0.75,
         ease: 'bounce',
-      }
-    )
-    // Video Swap
-    meshes.Tsukubai.traverse((child) => {
-      if (child.isMesh) {
-        // Store the original texture to switch back on mouseout
-        if (!child.userData.originalMap) {
-          child.userData.originalMap = child.material.map;
+      });
+
+      gsap.to(target.position, {
+        y: initialY + 0.2,
+        duration: 0.75,
+        ease: 'bounce',
+      });
+
+      // Video Swap Logic
+      target.traverse((child) => {
+        if (child.isMesh) {
+          // Store original texture once
+          if (!child.userData.originalMap) {
+            child.userData.originalMap = child.material.map;
+          }
+          child.material.map = videoTexture;
+          child.material.needsUpdate = true;
         }
+      });
 
-        child.material.map = videoTexture;
-        child.material.needsUpdate = true;
-      }
+      video.play();
     });
-    // Start the video when hovered
-    video.play();
-  })
 
-  meshes.Tsukubai.addEventListener('mouseout', () => {
-    // Return Scale
-    gsap.to(meshes.Tsukubai.scale, {
-      x: 1, y: 1, z: 1,
-      duration: 0.75,
-      ease: 'bounce',
-    })
-
-    gsap.to(meshes.Tsukubai.position,
-      {
-        x: meshes.Tsukubai.position.x,
-        y: meshes.Tsukubai.position.y - 0.2,
-        z: meshes.Tsukubai.position.z,
+    target.addEventListener('mouseout', () => {
+      gsap.to(target.scale, {
+        x: 1, y: 1, z: 1,
         duration: 0.75,
         ease: 'bounce',
-      }
-    )
-    // Return to Original Texture
-    meshes.Tsukubai.traverse((child) => {
-      if (child.isMesh && child.userData.originalMap !== undefined) {
-        child.material.map = child.userData.originalMap;
-        child.material.needsUpdate = true;
-      }
+      });
+
+      gsap.to(target.position, {
+        y: initialY,
+        duration: 0.75,
+        ease: 'bounce',
+      });
+
+      // Return to Original Texture
+      target.traverse((child) => {
+        if (child.isMesh && child.userData.originalMap !== undefined) {
+          child.material.map = child.userData.originalMap;
+          child.material.needsUpdate = true;
+        }
+      });
     });
-
-    // Optional: video.pause(); 
-  })
-
-  interactionManager.add(meshes.Tsukubai)
+    interactionManager.add(target);
+  });
 }
 
