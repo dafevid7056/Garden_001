@@ -14,11 +14,43 @@ import { environment } from './environment.js'
 let modelFlag = false
 let composer
 
+const assetUrl = (path) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`
+
 /* ------------------------------ VIDEO TEXTURE ----------------------------- */
 const video = document.getElementById('video');
 const video2 = document.getElementById('video2');
 const video3 = document.getElementById('video3');
 const video4 = document.getElementById('video4');
+
+const videoSources = {
+  video: 'Bearghain_Video.mp4',
+  video2: 'Tunnel.mp4',
+  video3: 'Chapinero_Alto.mp4',
+  video4: 'Rosales.mp4',
+}
+
+const overlayVideoSources = {
+  'overlay-Rosales': 'Rosales.mp4',
+  'overlay-Tunnel': 'Tunnel.mp4',
+  'overlay-Bearghain': 'Bearghain_Video.mp4',
+  'overlay-Chapinero_Alto': 'Chapinero_Alto.mp4',
+}
+
+Object.entries(videoSources).forEach(([id, src]) => {
+  const videoElement = document.getElementById(id)
+  if (!videoElement) return
+  videoElement.src = assetUrl(src)
+  videoElement.load()
+})
+
+Object.entries(overlayVideoSources).forEach(([overlayId, src]) => {
+  const overlay = document.getElementById(overlayId)
+  const overlayVideo = overlay?.querySelector('video')
+  if (!overlayVideo) return
+  overlayVideo.src = assetUrl(src)
+  overlayVideo.load()
+})
+
 const videoTexture = new THREE.VideoTexture(video);
 const videoTexture2 = new THREE.VideoTexture(video2);
 const videoTexture3 = new THREE.VideoTexture(video3);
@@ -33,39 +65,48 @@ videoTexture4.colorSpace = THREE.SRGBColorSpace;
 /* -------------------------------------------------------------------------- */
 
 const gardenObjects = [
-  { name: 'Butterfly', url: './butterfly.glb', materialType: 'packed' },
-  { name: 'Column_1', url: './Column_1.glb', materialType: 'phong', color: 0xFEF6EC },
-  { name: 'Column_2', url: './Column_2.glb', materialType: 'phong', color: 0xFEF6EC },
-  { name: 'Glass_1', url: './Glass_1.glb', materialType: 'glass' },
-  { name: 'Glass_2', url: './Glass_2.glb', materialType: 'glass' },
-  { name: 'Gravel_floor_1', url: './Gravel_floor_1.glb', materialType: 'phong', color: 0xdad7cd },
-  { name: 'Gravel_floor_2', url: './Gravel_floor_2.glb', materialType: 'phong', color: 0xedede9 },
-  { name: 'Lamp', url: './Lamp.glb', materialType: 'packed' },
-  { name: 'Rock_1', url: './Rock_1.glb', materialType: 'packed' },
-  { name: 'Rock_2', url: './Rock_2.glb', materialType: 'packed' },
-  { name: 'Roof', url: './Roof.glb', materialType: 'phong', color: 0xF9E5DC },
-  { name: 'Shrubs_Group_1A', url: './Shrubs.glb', materialType: 'packed' },
-  { name: 'Stepping_stones_1', url: './Stepping_stones_1.glb', materialType: 'packed' },
-  { name: 'Stepping_stones_2', url: './Stepping_stones_2.glb', materialType: 'packed' },
-  { name: 'Stepping_stones_3', url: './Stepping_stones_3.glb', materialType: 'packed' },
-  { name: 'Stepping_stones_4', url: './Stepping_stones_4.glb', materialType: 'packed' },
-  { name: 'Stepping_stones_5', url: './Stepping_stones_5.glb', materialType: 'packed' },
-  { name: 'Stepping_stones_6', url: './Stepping_stones_6.glb', materialType: 'packed' },
-  { name: 'Three_front', url: './Three_front.glb', materialType: 'packed' },
-  { name: 'Tree_back', url: './Tree_back.glb', materialType: 'packed' },
-  { name: 'Tsukubai', url: './Tsukubai.glb', materialType: 'packed' },
-  { name: 'Vertical_rock_1', url: './Vertical_rock_1.glb', materialType: 'packed' },
-  { name: 'Vertical_rock_2', url: './Vertical_rock_2.glb', materialType: 'packed' },
-  { name: 'Wall_1', url: './Wall_1.glb', materialType: 'phong', color: 0xFEF6EC },
-  { name: 'Wall_2', url: './Wall_2.glb', materialType: 'phong', color: 0xFEF6EC },
-  { name: 'Wall_3', url: './Wall_3.glb', materialType: 'phong', color: 0xFEF6EC },
-  { name: 'Wall_4', url: './Wall_4.glb', materialType: 'phong', color: 0xFEF6EC },
-  { name: 'Wall_5', url: './Wall_5.glb', materialType: 'phong', color: 0xFEF6EC },
-  { name: 'Window_1', url: './Window_1.glb', materialType: 'phong', color: 0xF9E5DC },
-  { name: 'Wooden_beam', url: './Wooden_beam.glb', materialType: 'phong', color: 0xF9E5DC },
-  { name: 'Wooden_floor', url: './Wooden_floor.glb', materialType: 'phong', color: 0xF9E5DC },
-  { name: 'Wooden_gate', url: './Wooden_gate.glb', materialType: 'phong', color: 0xF9E5DC },
+  { name: 'Butterfly', url: assetUrl('butterfly.glb'), materialType: 'packed' },
+  { name: 'Column_1', url: assetUrl('Column_1.glb'), materialType: 'phong', color: 0xFEF6EC },
+  { name: 'Column_2', url: assetUrl('Column_2.glb'), materialType: 'phong', color: 0xFEF6EC },
+  { name: 'Glass_1', url: assetUrl('Glass_1.glb'), materialType: 'glass' },
+  { name: 'Glass_2', url: assetUrl('Glass_2.glb'), materialType: 'glass' },
+  { name: 'Gravel_floor_1', url: assetUrl('Gravel_floor_1.glb'), materialType: 'phong', color: 0xdad7cd },
+  { name: 'Gravel_floor_2', url: assetUrl('Gravel_floor_2.glb'), materialType: 'phong', color: 0xedede9 },
+  { name: 'Lamp', url: assetUrl('Lamp.glb'), materialType: 'packed' },
+  { name: 'Rock_1', url: assetUrl('Rock_1.glb'), materialType: 'packed' },
+  { name: 'Rock_2', url: assetUrl('Rock_2.glb'), materialType: 'packed' },
+  { name: 'Roof', url: assetUrl('Roof.glb'), materialType: 'phong', color: 0xF9E5DC },
+  { name: 'Shrubs_Group_1A', url: assetUrl('Shrubs.glb'), materialType: 'packed' },
+  { name: 'Stepping_stones_1', url: assetUrl('Stepping_stones_1.glb'), materialType: 'packed' },
+  { name: 'Stepping_stones_2', url: assetUrl('Stepping_stones_2.glb'), materialType: 'packed' },
+  { name: 'Stepping_stones_3', url: assetUrl('Stepping_stones_3.glb'), materialType: 'packed' },
+  { name: 'Stepping_stones_4', url: assetUrl('Stepping_stones_4.glb'), materialType: 'packed' },
+  { name: 'Stepping_stones_5', url: assetUrl('Stepping_stones_5.glb'), materialType: 'packed' },
+  { name: 'Stepping_stones_6', url: assetUrl('Stepping_stones_6.glb'), materialType: 'packed' },
+  { name: 'Three_front', url: assetUrl('Three_front.glb'), materialType: 'packed' },
+  { name: 'Tree_back', url: assetUrl('Tree_back.glb'), materialType: 'packed' },
+  { name: 'Tsukubai', url: assetUrl('Tsukubai.glb'), materialType: 'packed' },
+  { name: 'Vertical_rock_1', url: assetUrl('Vertical_rock_1.glb'), materialType: 'packed' },
+  { name: 'Vertical_rock_2', url: assetUrl('Vertical_rock_2.glb'), materialType: 'packed' },
+  { name: 'Wall_1', url: assetUrl('Wall_1.glb'), materialType: 'phong', color: 0xFEF6EC },
+  { name: 'Wall_2', url: assetUrl('Wall_2.glb'), materialType: 'phong', color: 0xFEF6EC },
+  { name: 'Wall_3', url: assetUrl('Wall_3.glb'), materialType: 'phong', color: 0xFEF6EC },
+  { name: 'Wall_4', url: assetUrl('Wall_4.glb'), materialType: 'phong', color: 0xFEF6EC },
+  { name: 'Wall_5', url: assetUrl('Wall_5.glb'), materialType: 'phong', color: 0xFEF6EC },
+  { name: 'Window_1', url: assetUrl('Window_1.glb'), materialType: 'phong', color: 0xF9E5DC },
+  { name: 'Wooden_beam', url: assetUrl('Wooden_beam.glb'), materialType: 'phong', color: 0xF9E5DC },
+  { name: 'Wooden_floor', url: assetUrl('Wooden_floor.glb'), materialType: 'phong', color: 0xF9E5DC },
+  { name: 'Wooden_gate', url: assetUrl('Wooden_gate.glb'), materialType: 'phong', color: 0xF9E5DC },
 ];
+
+const interactiveMap = {
+  'Tsukubai': { texture: videoTexture4, video: video4, overlayId: 'overlay-Rosales' },
+  'Lamp': { texture: videoTexture3, video: video3, overlayId: 'overlay-Chapinero_Alto' },
+  'Vertical_rock_2': { texture: videoTexture, video: video, overlayId: 'overlay-Bearghain' },
+  'Stepping_stones_1': { texture: videoTexture2, video: video2, overlayId: 'overlay-Tunnel' },
+}
+
+const initializedInteractions = new Set()
 
 const scene = new THREE.Scene()
 
@@ -131,7 +172,7 @@ function applySceneMode(mode) {
   activeLights = addLights(scene, mode)
 
   const hdrFile = mode === 'night' ? 'nightsky.hdr' : 'Sky.hdr'
-  const envMap = environment(hdrFile)
+  const envMap = environment(assetUrl(hdrFile))
   scene.background = envMap
   scene.environment = envMap
 }
@@ -149,6 +190,9 @@ function instances() {
       color: obj.color || 0xffffff,
       animationState: true,
       mixers: mixers,
+      callback: () => {
+        interactions()
+      },
       // replace: true
     })
     model.init()
@@ -216,11 +260,6 @@ function animate() {
   // composer.render()
   controls.update()
   interactionManager.update()
-
-  if (!modelFlag && meshes.Tsukubai && meshes.Lamp && meshes.Vertical_rock_2 && meshes.Stepping_stones_1) {
-    interactions()
-    modelFlag = true
-  }
 }
 
 /* -------------------------------------------------------------------------- */
@@ -228,21 +267,16 @@ function animate() {
 /* -------------------------------------------------------------------------- */
 
 function interactions() {
-
-  // interactive objects witn assigned video textures
-  const interactiveMap = {
-    'Tsukubai': { texture: videoTexture4, video: video4, overlayId: 'overlay-Rosales' },
-    'Lamp': { texture: videoTexture3, video: video3, overlayId: 'overlay-Chapinero_Alto' },
-    'Vertical_rock_2': { texture: videoTexture, video: video, overlayId: 'overlay-Bearghain' },
-    'Stepping_stones_1': { texture: videoTexture2, video: video2, overlayId: 'overlay-Tunnel' },
-  }
-
   Object.entries(interactiveMap).forEach(([name, { texture, video: vid, overlayId }]) => {
-    const target = meshes[name];
-    if (!target) {
-      console.warn(`Mesh ${name} not found yet.`);
+    if (initializedInteractions.has(name)) {
       return;
     }
+
+    const target = meshes[name];
+    if (!target) {
+      return;
+    }
+
     let videoSwapTimeout = null;
     let isRevealed = false;
     // Capture the initial position
@@ -250,8 +284,12 @@ function interactions() {
 
     // Get the overlay and its video element
     const overlay = document.getElementById(overlayId);
-    const overlayVideo = overlay.querySelector('video');
-    const closeBtn = overlay.querySelector('.close-btn');
+    const overlayVideo = overlay?.querySelector('video');
+
+    if (!overlay || !overlayVideo) {
+      console.warn(`Overlay ${overlayId} not found for ${name}.`);
+      return;
+    }
 
     // Close on background click (outside the video)
     overlay.addEventListener('click', (event) => {
@@ -334,6 +372,9 @@ function interactions() {
     });
 
     interactionManager.add(target);
+    initializedInteractions.add(name)
   });
+
+  modelFlag = initializedInteractions.size === Object.keys(interactiveMap).length
 }
 

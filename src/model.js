@@ -21,6 +21,8 @@ import {
 	Mesh,
 } from 'three'
 
+const assetUrl = (path) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`
+
 //create our class, we're using a class since this is a modular template for loading various models
 export default class Model {
 	//this is akin to our setup function where we create a bunch of default states or variables
@@ -33,7 +35,7 @@ export default class Model {
 		//new manager line!
 		this.loader = new GLTFLoader(obj.manager)
 		this.dracoLoader = new DRACOLoader()
-		this.dracoLoader.setDecoderPath('./draco/')
+		this.dracoLoader.setDecoderPath(assetUrl('draco/'))
 		this.loader.setDRACOLoader(this.dracoLoader)
 		this.textureLoader = new TextureLoader()
 		//this structure is slightly different than the basic var name = value, we basically use the or operator || to set the default to false if obj.animationState or obj.replace is undefined. In the case we don't pass any values into either of those obj.animationState will be undefined and thus this will be resolved as this.animations = (undefined || false) aka this.animations = false
@@ -43,13 +45,13 @@ export default class Model {
 		//Why do we do this ternary operator? Well if obj.replaceURL isn't passed in we don't want to try and set our matcap to a value that doesn't exist, this way we only set it to the replaceURL if it exists otherwise we go to a fallback value
 		this.defaultMatcap = obj.replaceURL
 			? this.textureLoader.load(`${obj.replaceURL}`)
-			: this.textureLoader.load('/mat.png')
+			: this.textureLoader.load(assetUrl('mat.png'))
 
 		this.mixer = null
 		this.mixers = obj.mixers
 		this.defaultParticle = obj.particleURL
 			? this.textureLoader.load(`${obj.particleURL}`)
-			: this.textureLoader.load('/10.png')
+			: this.textureLoader.load(assetUrl('10.png'))
 		this.scale = obj.scale || new Vector3(1, 1, 1)
 		this.position = obj.position || new Vector3(0, 0, 0)
 		this.rotation = obj.rotation || new Vector3(0, 0, 0)
@@ -135,6 +137,8 @@ export default class Model {
 				this.callback(this.meshes[`${this.name}`])
 			}
 			this.scene.add(this.meshes[`${this.name}`])
+		}, undefined, (error) => {
+			console.error(`Failed to load model "${this.name}" from ${this.file}`, error)
 		})
 	}
 	//ignore for now, WIP from my end
