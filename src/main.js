@@ -13,7 +13,6 @@ import { environment } from './environment.js'
 
 let modelFlag = false
 let composer
-
 const assetUrl = (path) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`
 
 /* ------------------------------ VIDEO TEXTURE ----------------------------- */
