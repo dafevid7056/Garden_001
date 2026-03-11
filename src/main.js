@@ -16,8 +16,17 @@ let composer
 
 /* ------------------------------ VIDEO TEXTURE ----------------------------- */
 const video = document.getElementById('video');
+const video2 = document.getElementById('video2');
+const video3 = document.getElementById('video3');
+const video4 = document.getElementById('video4');
 const videoTexture = new THREE.VideoTexture(video);
+const videoTexture2 = new THREE.VideoTexture(video2);
+const videoTexture3 = new THREE.VideoTexture(video3);
+const videoTexture4 = new THREE.VideoTexture(video4);
 videoTexture.colorSpace = THREE.SRGBColorSpace;
+videoTexture2.colorSpace = THREE.SRGBColorSpace;
+videoTexture3.colorSpace = THREE.SRGBColorSpace;
+videoTexture4.colorSpace = THREE.SRGBColorSpace;
 
 /* -------------------------------------------------------------------------- */
 /*                               GARDEN OBJECTS                               */
@@ -83,16 +92,17 @@ const interactionManager = new InteractionManager(
 const controls = new OrbitControls(camera, renderer.domElement)
 controls.enableDamping = true
 controls.dampingFactor = 0.8
-controls.minPolarAngle = Math.PI / 2.8
+controls.minPolarAngle = Math.PI / 2.4
 controls.maxPolarAngle = Math.PI / 2
-controls.minAzimuthAngle = -Math.PI / 18
+controls.minAzimuthAngle = -Math.PI / 20
 controls.maxAzimuthAngle = Math.PI / 10
 controls.minDistance = 4
 controls.maxDistance = 7
 
 const meshes = {}
 const mixers = []
-// const lights = {}
+let activeLights = []
+let sceneMode = 'day'
 const clock = new THREE.Clock()
 
 init()
@@ -104,20 +114,26 @@ function init() {
 
   composer = postprocessing(scene, camera, renderer)
 
-  // lights.default = addLights()
-  // scene.add(lights.default)
-
-  addLights(scene)
+  applySceneMode('day')
 
   console.log(meshes)
-
-  scene.background = environment()
-  scene.environment = environment()
-  scene.environment.intensity = 2.0
 
   instances()
   resize()
   animate()
+}
+
+function applySceneMode(mode) {
+  sceneMode = mode
+
+  // remove previous mode lights before adding the other scene lights
+  activeLights.forEach((light) => scene.remove(light))
+  activeLights = addLights(scene, mode)
+
+  const hdrFile = mode === 'night' ? 'nightsky.hdr' : 'Sky.hdr'
+  const envMap = environment(hdrFile)
+  scene.background = envMap
+  scene.environment = envMap
 }
 
 function instances() {
@@ -157,12 +173,27 @@ window.addEventListener('keydown', (event) => {
     case 'o': // Outside camera
       camera.position.copy(cameraPosition)
       camera.lookAt(cameraTarget)
-      controls.minAzimuthAngle = -Math.PI / 18
+      controls.minAzimuthAngle = -Math.PI / 20
       controls.maxAzimuthAngle = Math.PI / 10
-      controls.minPolarAngle = Math.PI / 2.8
+      controls.minPolarAngle = Math.PI / 2.4
       controls.maxPolarAngle = Math.PI / 2
       controls.minDistance = 4
       controls.maxDistance = 7
+      break;
+  }
+});
+
+window.addEventListener('keydown', (event) => {
+  switch (event.key) {
+    case 'n': // Night mode
+      if (sceneMode !== 'night') {
+        applySceneMode('night')
+      }
+      break;
+    case 'd': // Day mode
+      if (sceneMode !== 'day') {
+        applySceneMode('day')
+      }
       break;
   }
 });
@@ -186,7 +217,7 @@ function animate() {
   controls.update()
   interactionManager.update()
 
-  if (!modelFlag && meshes.Tsukubai) {
+  if (!modelFlag && meshes.Tsukubai && meshes.Lamp && meshes.Vertical_rock_2 && meshes.Stepping_stones_1) {
     interactions()
     modelFlag = true
   }
@@ -197,19 +228,39 @@ function animate() {
 /* -------------------------------------------------------------------------- */
 
 function interactions() {
-  const interactiveNames = ['Tsukubai', 'Stepping_stones_1', 'Vertical_rock_2', 'Lamp'];
 
-  interactiveNames.forEach((name) => {
+  // interactive objects witn assigned video textures
+  const interactiveMap = {
+    'Tsukubai': { texture: videoTexture4, video: video4, overlayId: 'overlay-Rosales' },
+    'Lamp': { texture: videoTexture3, video: video3, overlayId: 'overlay-Chapinero_Alto' },
+    'Vertical_rock_2': { texture: videoTexture, video: video, overlayId: 'overlay-Bearghain' },
+    'Stepping_stones_1': { texture: videoTexture2, video: video2, overlayId: 'overlay-Tunnel' },
+  }
+
+  Object.entries(interactiveMap).forEach(([name, { texture, video: vid, overlayId }]) => {
     const target = meshes[name];
-
-    // Check if the object exists in the meshes object
     if (!target) {
       console.warn(`Mesh ${name} not found yet.`);
       return;
     }
-
+    let videoSwapTimeout = null;
+    let isRevealed = false;
     // Capture the initial position
     const initialY = target.position.y;
+
+    // Get the overlay and its video element
+    const overlay = document.getElementById(overlayId);
+    const overlayVideo = overlay.querySelector('video');
+    const closeBtn = overlay.querySelector('.close-btn');
+
+    // Close on background click (outside the video)
+    overlay.addEventListener('click', (event) => {
+      if (event.target === overlay) {
+        overlay.classList.remove('active');
+        overlayVideo.pause();
+        overlayVideo.currentTime = 0;
+      }
+    });
 
     target.addEventListener('mouseover', (event) => {
       gsap.to(target.scale, {
@@ -224,22 +275,33 @@ function interactions() {
         ease: 'bounce',
       });
 
-      // Video Swap Logic
+      // Video Swap
+
       target.traverse((child) => {
         if (child.isMesh) {
-          // Store original texture once
           if (!child.userData.originalMap) {
             child.userData.originalMap = child.material.map;
           }
-          child.material.map = videoTexture;
-          child.material.needsUpdate = true;
         }
       });
 
-      video.play();
+      videoSwapTimeout = setTimeout(() => {
+        target.traverse((child) => {
+          if (child.isMesh) {
+            child.material.map = texture;
+            child.material.needsUpdate = true;
+          }
+        });
+        vid.play();
+        isRevealed = true;
+      }, 2000);
     });
 
     target.addEventListener('mouseout', () => {
+      clearTimeout(videoSwapTimeout);
+      videoSwapTimeout = null;
+      isRevealed = false;
+
       gsap.to(target.scale, {
         x: 1, y: 1, z: 1,
         duration: 0.75,
@@ -252,6 +314,9 @@ function interactions() {
         ease: 'bounce',
       });
 
+      vid.pause();
+      vid.currentTime = 0;
+
       // Return to Original Texture
       target.traverse((child) => {
         if (child.isMesh && child.userData.originalMap !== undefined) {
@@ -260,6 +325,14 @@ function interactions() {
         }
       });
     });
+
+    // Click only works after isRevealed is true
+    target.addEventListener('click', () => {
+      if (!isRevealed) return;
+      overlay.classList.add('active');
+      overlayVideo.play();
+    });
+
     interactionManager.add(target);
   });
 }

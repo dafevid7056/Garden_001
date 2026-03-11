@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 
 export const createVideoTexture = (videoId) => {
-    //standard grabbing the html element via id, using js to also play the video
+    //grab the html video element via id, using js to also play the video
     const video = document.getElementById(videoId);
     video.play();
     //create a new video texture using the data from the html video
