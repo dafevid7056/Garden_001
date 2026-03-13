@@ -155,15 +155,15 @@ button:focus-visible {
   position: fixed;
   bottom: 24px;
   left: 50%;
+  width: 91%;
   transform: translateX(-50%);
   text-align: center;
-  font-size: 12pt;
+  font-size: 10pt;
   color: #3a3a3a;
   background-color: rgba(254, 246, 236, 0.4);
   padding: 10px 18px;
   border-radius: 6px;
   pointer-events: none;
-  animation: fadeInOut 15s ease forwards;
 }
 
 #instructions p {
@@ -173,11 +173,4 @@ button:focus-visible {
 #instructions kbd {
   font-family: inherit;
   font-size: inherit;
-}
-
-@keyframes fadeInOut {
-  0%   { opacity: 0; }
-  10%  { opacity: 1; }
-  80%  { opacity: 1; }
-  100% { opacity: 0; }
 }

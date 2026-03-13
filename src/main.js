@@ -98,6 +98,7 @@ const gardenObjects = [
   { name: 'Wooden_gate', url: assetUrl('Wooden_gate.glb'), materialType: 'phong', color: 0xF9E5DC },
 ];
 
+// Map of interactive objects with video textures and overlay IDs
 const interactiveMap = {
   'Tsukubai': { texture: videoTexture4, video: video4, overlayId: 'overlay-Rosales' },
   'Lamp': { texture: videoTexture3, video: video3, overlayId: 'overlay-Chapinero_Alto' },
@@ -162,7 +163,7 @@ function init() {
   resize()
   animate()
 }
-
+  // Function to apply the scene mode, be that day or night
 function applySceneMode(mode) {
   sceneMode = mode
 
@@ -198,6 +199,10 @@ function instances() {
   })
 }
 
+/* -------------------------------------------------------------------------- */
+/*                CONTROLS FOR INSIDE AND OUTSIDE CAMERA VIEWS                */
+/* -------------------------------------------------------------------------- */
+
 window.addEventListener('keydown', (event) => {
   switch (event.key) {
     case 'i': // Inside camera
@@ -225,7 +230,9 @@ window.addEventListener('keydown', (event) => {
       break;
   }
 });
-
+/* -------------------------------------------------------------------------- */
+/*              EVENT LISTENERS FOR DAY AND NIGHT MODE SWITCHING              */
+/* -------------------------------------------------------------------------- */
 window.addEventListener('keydown', (event) => {
   switch (event.key) {
     case 'n': // Night mode
