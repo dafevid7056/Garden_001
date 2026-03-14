@@ -100,10 +100,10 @@ const gardenObjects = [
 
 // Map of interactive objects with video textures and overlay IDs
 const interactiveMap = {
-  'Tsukubai': { texture: videoTexture4, video: video4, overlayId: 'overlay-Rosales' },
-  'Lamp': { texture: videoTexture3, video: video3, overlayId: 'overlay-Chapinero_Alto' },
-  'Vertical_rock_2': { texture: videoTexture, video: video, overlayId: 'overlay-Bearghain' },
-  'Stepping_stones_1': { texture: videoTexture2, video: video2, overlayId: 'overlay-Tunnel' },
+  'Tsukubai': { texture: videoTexture4, video: video4, overlayId: 'overlay-Rosales', mode: 'day' },
+  'Lamp': { texture: videoTexture3, video: video3, overlayId: 'overlay-Chapinero_Alto', mode: 'night' },
+  'Vertical_rock_2': { texture: videoTexture, video: video, overlayId: 'overlay-Bearghain', mode: 'night' },
+  'Stepping_stones_1': { texture: videoTexture2, video: video2, overlayId: 'overlay-Tunnel', mode: 'day' },
 }
 
 const initializedInteractions = new Set()
@@ -273,7 +273,7 @@ function animate() {
 /* -------------------------------------------------------------------------- */
 
 function interactions() {
-  Object.entries(interactiveMap).forEach(([name, { texture, video: vid, overlayId }]) => {
+  Object.entries(interactiveMap).forEach(([name, { texture, video: vid, overlayId, mode }]) => {
     if (initializedInteractions.has(name)) {
       return;
     }
@@ -285,7 +285,6 @@ function interactions() {
 
     let videoSwapTimeout = null;
     let isRevealed = false;
-    // Capture the initial position
     const initialY = target.position.y;
 
     // Get the overlay and its video element
@@ -296,6 +295,8 @@ function interactions() {
       console.warn(`Overlay ${overlayId} not found for ${name}.`);
       return;
     }
+    // Function to check if the current scene mode matches the object's mode
+    const isModeActive = () => sceneMode === mode
 
     // Close on background click (outside the video)
     overlay.addEventListener('click', (event) => {
@@ -307,6 +308,8 @@ function interactions() {
     });
 
     target.addEventListener('mouseover', (event) => {
+      if (!isModeActive()) return;
+
       gsap.to(target.scale, {
         x: 1.1, y: 1.1, z: 1.1,
         duration: 0.75,
@@ -330,6 +333,9 @@ function interactions() {
       });
 
       videoSwapTimeout = setTimeout(() => {
+        // check if mode has changed in the first 2 seconds
+        if (!isModeActive()) return
+
         target.traverse((child) => {
           if (child.isMesh) {
             child.material.map = texture;
@@ -372,7 +378,7 @@ function interactions() {
 
     // Click only works after isRevealed is true
     target.addEventListener('click', () => {
-      if (!isRevealed) return;
+      if (!isModeActive() || !isRevealed) return
       overlay.classList.add('active');
       overlayVideo.play();
     });
