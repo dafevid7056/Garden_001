@@ -14,6 +14,13 @@ import { environment } from './environment.js'
 let modelFlag = false
 let composer
 const assetUrl = (path) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`
+const loadingScreen = document.getElementById('loading-screen')
+const loadingMessage = document.getElementById('loading-message')
+
+let loadedModelsCount = 0
+let allModelsLoaded = false
+let allVideosLoaded = false
+let isReadyToStart = false
 
 /* ------------------------------ VIDEO TEXTURE ----------------------------- */
 const video = document.getElementById('video');
@@ -49,6 +56,16 @@ Object.entries(overlayVideoSources).forEach(([overlayId, src]) => {
   overlayVideo.src = assetUrl(src)
   overlayVideo.load()
 })
+
+const preloadVideos = [
+  video,
+  video2,
+  video3,
+  video4,
+  ...Object.keys(overlayVideoSources)
+    .map((overlayId) => document.getElementById(overlayId)?.querySelector('video'))
+    .filter(Boolean),
+]
 
 const videoTexture = new THREE.VideoTexture(video);
 const videoTexture2 = new THREE.VideoTexture(video2);
@@ -147,6 +164,77 @@ let sceneMode = 'day'
 const clock = new THREE.Clock()
 
 init()
+waitForInitialVideos()
+
+function waitForVideoReady(videoElement) {
+  return new Promise((resolve) => {
+    if (!videoElement) {
+      resolve()
+      return
+    }
+
+    if (videoElement.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+      resolve()
+      return
+    }
+
+    const onReady = () => {
+      cleanup()
+      resolve()
+    }
+
+    const onError = () => {
+      cleanup()
+      console.warn(`Video failed to load: ${videoElement.currentSrc || videoElement.src}`)
+      resolve()
+    }
+
+    const cleanup = () => {
+      videoElement.removeEventListener('loadeddata', onReady)
+      videoElement.removeEventListener('canplaythrough', onReady)
+      videoElement.removeEventListener('error', onError)
+    }
+
+    videoElement.addEventListener('loadeddata', onReady, { once: true })
+    videoElement.addEventListener('canplaythrough', onReady, { once: true })
+    videoElement.addEventListener('error', onError, { once: true })
+  })
+}
+
+async function waitForInitialVideos() {
+  await Promise.all(preloadVideos.map((videoElement) => waitForVideoReady(videoElement)))
+  allVideosLoaded = true
+  updateLoadingScreenState()
+}
+
+function onModelLoaded() {
+  loadedModelsCount += 1
+  if (loadedModelsCount === gardenObjects.length) {
+    allModelsLoaded = true
+    updateLoadingScreenState()
+  }
+}
+
+function updateLoadingScreenState() {
+  if (!loadingScreen || !loadingMessage || isReadyToStart) {
+    return
+  }
+
+  if (allModelsLoaded && allVideosLoaded) {
+    isReadyToStart = true
+    loadingMessage.textContent = 'Click anywhere to start'
+    loadingScreen.classList.add('ready')
+    window.addEventListener('pointerdown', hideLoadingScreen, { once: true })
+  }
+}
+
+function hideLoadingScreen() {
+  if (!loadingScreen || !isReadyToStart) {
+    return
+  }
+
+  loadingScreen.classList.add('hidden')
+}
 
 function init() {
   // we do all of our setup here
@@ -191,7 +279,11 @@ function instances() {
       animationState: true,
       mixers: mixers,
       callback: () => {
+        onModelLoaded()
         interactions()
+      },
+      errorCallback: () => {
+        onModelLoaded()
       },
       // replace: true
     })

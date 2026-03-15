@@ -62,6 +62,7 @@ export default class Model {
 			new Color('#A73489'),
 		]
 		this.callback = obj.callback
+		this.errorCallback = obj.errorCallback
 		this.materialType = obj.materialType || 'packed'
 		this.color = obj.color || 0xffffff
 	}
@@ -139,6 +140,9 @@ export default class Model {
 			this.scene.add(this.meshes[`${this.name}`])
 		}, undefined, (error) => {
 			console.error(`Failed to load model "${this.name}" from ${this.file}`, error)
+			if (this.errorCallback) {
+				this.errorCallback(error, this.name)
+			}
 		})
 	}
 	//ignore for now, WIP from my end

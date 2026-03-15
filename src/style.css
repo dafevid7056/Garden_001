@@ -90,7 +90,8 @@ h1 {
 .overlayText {
   color: white;
   font-size: 12pt;
-  margin: 0;
+  margin-left: 200px;
+  margin-right: 200px;
   text-align: center;
 }
 
@@ -145,6 +146,33 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+#loading-screen {
+  position: fixed;  
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(122, 122, 122, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  flex-direction: column;
+  color: #fff;
+  font-size: 1.2em;
+  letter-spacing: 0.05em;
+  transition: opacity 0.4s;
+}
+
+#loading-screen.ready {
+  cursor: pointer;
+}
+
+#loading-screen.hidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* -------------------------------------------------------------------------- */
