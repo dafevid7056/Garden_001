@@ -5,21 +5,27 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>A Beautiful Garden</title>
+  <title>A Garden for Friends and Lovers</title>
 </head>
 
 <body>
+  <button id="music-pause-button" class="overlay-close-button" type="button" aria-label="Pause background music">
+    Pause music
+  </button>
+
   <div id="loading-screen">
     <div class="spinner"></div>
-    <p>This is my garden.</p>
-    <p>A place where I grow my ideas and share my life moments with you.</p>
+    <p>I'm David Felipe, this is my garden.</p>
+    <p>A place where I share my life moments.</p>
     <p>Some objects in the garden are interactive. Try finding out which ones!</p>
+    <p>A few of my friends might find something specially for them.</p>
     <p id="loading-message">Loading...</p>
   </div>
 
   <div id="instructions">
     <p><b>Scroll</b> to zoom — <b>Click and drag</b> to orbit — Press <b>I</b> to view from inside the house — Press
-      <b>O</b> to view from outside — Press <b>N</b> to switch to night mode — Press <b>D</b> to switch to day mode</p>
+      <b>O</b> to view from outside — Press <b>N</b> to switch to night mode — Press <b>D</b> to switch to day mode
+    </p>
   </div>
 
   <video id="video" src='Bearghain_Video.mp4' loop muted></video>
@@ -30,15 +36,23 @@
   <div class="video-overlay" id="overlay-Rosales">
     <div class="overlay-content">
       <video src='Rosales.mp4' loop></video>
-      <p class="overlayText">Sun setting at Gustavo Uribe Botero Park. It was a saturday and I needed to get some footage for a school project and I've always loved the tall trees from this park. You could see some movement on the clouds, although subtle. Everything was so still that day that this video almost looks like a still picture.</p>
-      <p class="overlayText">That day I was listening to: <a href="https://youtu.be/DPqULcZXuGE?si=8SXWeOFsFDdw6R5X" target="_blank">Rusowsky - Pikito</a></p>
+      <p class="overlayText">Sun setting at Gustavo Uribe Botero Park. It was a saturday and I needed to get some
+        footage for a school project and I've always loved the tall trees from this park. You could see some movement on
+        the clouds, although subtle. Everything was so still that day that this video almost looks like a still picture.
+      </p>
+      <p class="overlayText">That day I was listening to: <a href="https://youtu.be/3N88XszkcMQ?si=cRb8ctYh9iv3J43Q"
+          target="_blank">Rusowsky - ALTAGAMA</a></p>
     </div>
   </div>
 
   <div class="video-overlay" id="overlay-Tunnel">
     <div class="overlay-content">
       <video src='Tunnel.mp4' loop></video>
-      <p class="overlayText">Billing's Arcade in Fort Tyron Park. I was with Helena that day visiting the MET Cloisters. Super tired after walking around the museum and then the park. I was thinking about how crazy it is that some people decided to transport rocks across the ocean to re-build a medieval monastery in the middle of upper Manhattan. Very picturesque place. I particularly liked the courtyards and herbariums. They gave off a lovely smell and you could see butterflies and bumblebees flying around, which made it seem more alive and serene.</p>
+      <p class="overlayText">Billing's Arcade in Fort Tyron Park. I was with Helena that day visiting the MET Cloisters.
+        Super tired after walking around the museum and then the park. I was thinking about how crazy it is that some
+        people decided to transport rocks across the ocean to re-build a medieval monastery in the middle of upper
+        Manhattan. Very picturesque place. I particularly liked the courtyards and herbariums. They gave off a lovely
+        smell and you could see butterflies and bumblebees flying around, which made it seem more alive and serene.</p>
     </div>
   </div>
 
@@ -46,7 +60,11 @@
     <div class="overlay-content">
       <video src='Bearghain_Video.mp4' loop></video>
       <p class="overlayText">The Bearghain is a game we developed with an amazing group of artists (:</p>
-      <p class="overlayText">The game is set in the fictitious city of Bearlin, where most of the population are bears. Here you play as a kitty, who's disguised as a bear, trying rave for as long as possible at the Bearghain, the famous and most exclusive nightclub in the city. The game is set in a surreal version of the club, with floating platforms and strange creatures. To avoid getting kicked out by the bouncers you must follow hidden rules of behavior to pass off as a local. The highest score a player achieved was a little over 4 minutes.</p>
+      <p class="overlayText">The game is set in the fictitious city of Bearlin, where most of the population are bears.
+        Here you play as a kitty, who's disguised as a bear, trying rave for as long as possible at the Bearghain, the
+        famous and most exclusive nightclub in the city. The game is set in a surreal version of the club, with floating
+        platforms and strange creatures. To avoid getting kicked out by the bouncers you must follow hidden rules of
+        behavior to pass off as a local. The highest score a player achieved was a little over 4 minutes.</p>
     </div>
   </div>
 
@@ -54,11 +72,34 @@
     <div class="overlay-content">
       <video src='Chapinero_Alto.mp4' loop></video>
       <p class="overlayText">Bike ride in Chapinero Alto.</p>
-      <p class="overlayText">This particular route is difficult because it is very steep and there are a lot of traffic lights, which means you cannot maintain a steady speed (you can see me crossing a red light here 😬). However I love to take it as it is more scenic than just taking the Carrera Séptima. I've never taken the Avenida Circunvalar because it seems more dangerous with cars going way faster than anywhere else in the city. Maybe I can try it someday.</p>
-      <p class="overlayText">That afternoon I was listening to: <a href="https://youtu.be/o9lXFAii8pU?si=M1pIydxfAwnB4z-Q" target="_blank">The Way Things Go - Beabadoobee</a></p>
+      <p class="overlayText">This particular route is difficult because it is very steep and there are a lot of traffic
+        lights, which means you cannot maintain a steady speed (you can see me crossing a red light here 😬). However I
+        love to take it as it is more scenic than just taking the Carrera Séptima. I've never taken the Avenida
+        Circunvalar because it seems more dangerous with cars going way faster than anywhere else in the city. Maybe I
+        can try it someday.</p>
+      <p class="overlayText">That afternoon I was listening to: <a
+          href="https://youtu.be/_ePJBMKwUDM?si=WIp78E_cM7dPkAVN" target="_blank">Como Me Mira - Fonseca</a>
+      </p>
     </div>
   </div>
 
+  <div class="video-overlay" id="overlay-Three_front">
+    <div class="overlay-content">
+      <img src="/Friends_1.JPEG" alt="Image for a Friend" />
+      <p class="overlayText">You got this!</p>
+    </div>
+  </div>
+
+  <div class="video-overlay" id="overlay-Vertical_rock_1">
+    <div class="overlay-content">
+      <img src="/Friends_2.JPEG" alt="Image for a Friend" />
+      <p class="overlayText">I think you're very punk</p>
+    </div>
+  </div>
+
+  <div id="popup">
+    <p id="popup-text">hey there!</p>
+  </div>
   <script type="module" src="/src/main.js"></script>
 </body>
 

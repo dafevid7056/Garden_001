@@ -16,11 +16,19 @@ let composer
 const assetUrl = (path) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`
 const loadingScreen = document.getElementById('loading-screen')
 const loadingMessage = document.getElementById('loading-message')
+const musicPauseButton = document.getElementById('music-pause-button')
 
 let loadedModelsCount = 0
 let allModelsLoaded = false
 let allVideosLoaded = false
 let isReadyToStart = false
+const popup = document.getElementById('popup')
+const popupText = document.getElementById('popup-text')
+let popupHideTimeout = null
+let musicStarted = false
+const backgroundMusic = new Audio(assetUrl('melowmark-i-ly.mp3'))
+backgroundMusic.loop = true
+backgroundMusic.volume = 0.35
 
 /* ------------------------------ VIDEO TEXTURE ----------------------------- */
 const video = document.getElementById('video');
@@ -121,6 +129,24 @@ const interactiveMap = {
   'Lamp': { texture: videoTexture3, video: video3, overlayId: 'overlay-Chapinero_Alto', mode: 'night' },
   'Vertical_rock_2': { texture: videoTexture, video: video, overlayId: 'overlay-Bearghain', mode: 'night' },
   'Stepping_stones_1': { texture: videoTexture2, video: video2, overlayId: 'overlay-Tunnel', mode: 'day' },
+  'Three_front': {
+    texture: videoTexture2,
+    video: video2,
+    overlayId: 'overlay-Three_front',
+    mode: 'night',
+    hoverMessage: 'Hi V!',
+    unlockCode: 'V123',
+    lockedMessage: 'Please enter your code V. Remember it is case sensitive.',
+  },
+  'Vertical_rock_1': {
+    texture: videoTexture4,
+    video: video4,
+    overlayId: 'overlay-Vertical_rock_1',
+    mode: 'day',
+    hoverMessage: 'Hi Margie!',
+    unlockCode: 'MARGIE123',
+    lockedMessage: 'Please enter your code Margie. Remember it is case sensitive.',
+  },
 }
 
 const initializedInteractions = new Set()
@@ -228,12 +254,116 @@ function updateLoadingScreenState() {
   }
 }
 
+function showPopupMessage(message, autoHideDelay = null) {
+  if (!popup || !popupText) {
+    return
+  }
+
+  popupText.textContent = message
+  popup.classList.add('active')
+
+  if (popupHideTimeout) {
+    clearTimeout(popupHideTimeout)
+    popupHideTimeout = null
+  }
+
+  if (typeof autoHideDelay === 'number') {
+    popupHideTimeout = setTimeout(() => {
+      popup.classList.remove('active')
+      popupHideTimeout = null
+    }, autoHideDelay)
+  }
+}
+
+function closeOverlay(overlay, overlayVideo = null) {
+  overlay.classList.remove('active')
+  if (overlayVideo) {
+    overlayVideo.pause()
+    overlayVideo.currentTime = 0
+  }
+}
+
+function ensureOverlayCloseButton(overlay, overlayVideo = null) {
+  let closeButton = overlay.querySelector('.overlay-close-button')
+
+  if (!closeButton) {
+    closeButton = document.createElement('button')
+    closeButton.type = 'button'
+    closeButton.className = 'overlay-close-button'
+    closeButton.textContent = 'X'
+    closeButton.setAttribute('aria-label', 'Close video overlay')
+    overlay.appendChild(closeButton)
+  }
+
+  closeButton.addEventListener('click', (event) => {
+    event.stopPropagation()
+    closeOverlay(overlay, overlayVideo)
+  })
+}
+
+function getUnlockStorageKey(name) {
+  return `garden_unlock_${name}`
+}
+
+function isObjectUnlocked(name) {
+  return window.localStorage.getItem(getUnlockStorageKey(name)) === 'true'
+}
+
+function setObjectUnlocked(name) {
+  window.localStorage.setItem(getUnlockStorageKey(name), 'true')
+}
+
+function requestUnlock(name, unlockCode, lockedMessage) {
+  if (!unlockCode || isObjectUnlocked(name)) {
+    return true
+  }
+
+  const code = window.prompt(lockedMessage || 'Enter access code:')
+  if (code === null) {
+    return false
+  }
+
+  if (code.trim() === unlockCode) {
+    setObjectUnlocked(name)
+    showPopupMessage('Access granted.', 1400)
+    return true
+  }
+
+  showPopupMessage('Wrong code.', 1600)
+  return false
+}
+
 function hideLoadingScreen() {
   if (!loadingScreen || !isReadyToStart) {
     return
   }
 
   loadingScreen.classList.add('hidden')
+
+  if (!musicStarted) {
+    backgroundMusic.play().then(() => {
+      musicStarted = true
+    }).catch((error) => {
+      console.warn('Background music could not autoplay:', error)
+    })
+  }
+}
+
+if (musicPauseButton) {
+  musicPauseButton.addEventListener('click', () => {
+    if (!backgroundMusic.paused) {
+      backgroundMusic.pause()
+      musicPauseButton.textContent = 'Play music'
+      return
+    }
+
+    backgroundMusic.play().then(() => {
+      musicStarted = true
+      musicPauseButton.textContent = 'Pause music'
+    }).catch((error) => {
+      console.warn('Background music could not resume:', error)
+    })
+  })
 }
 
 function init() {
@@ -365,7 +495,10 @@ function animate() {
 /* -------------------------------------------------------------------------- */
 
 function interactions() {
-  Object.entries(interactiveMap).forEach(([name, { texture, video: vid, overlayId, mode }]) => {
+  Object.entries(interactiveMap).forEach(([
+    name,
+    { texture, video: vid, overlayId, mode, hoverMessage, unlockCode, lockedMessage },
+  ]) => {
     if (initializedInteractions.has(name)) {
       return;
     }
@@ -381,26 +514,29 @@ function interactions() {
 
     // Get the overlay and its video element
     const overlay = document.getElementById(overlayId);
-    const overlayVideo = overlay?.querySelector('video');
+    const overlayVideo = overlay?.querySelector('video') || null;
 
-    if (!overlay || !overlayVideo) {
+    if (!overlay) {
       console.warn(`Overlay ${overlayId} not found for ${name}.`);
       return;
     }
+
+    ensureOverlayCloseButton(overlay, overlayVideo)
+
     // Function to check if the current scene mode matches the object's mode
     const isModeActive = () => sceneMode === mode
 
     // Close on background click (outside the video)
     overlay.addEventListener('click', (event) => {
       if (event.target === overlay) {
-        overlay.classList.remove('active');
-        overlayVideo.pause();
-        overlayVideo.currentTime = 0;
+        closeOverlay(overlay, overlayVideo)
       }
     });
 
     target.addEventListener('mouseover', (event) => {
       if (!isModeActive()) return;
+
+      showPopupMessage(hoverMessage || 'hey there!')
 
       gsap.to(target.scale, {
         x: 1.1, y: 1.1, z: 1.1,
@@ -436,6 +572,7 @@ function interactions() {
         });
         vid.play();
         isRevealed = true;
+        showPopupMessage('you may click now.')
       }, 2000);
     });
 
@@ -443,6 +580,10 @@ function interactions() {
       clearTimeout(videoSwapTimeout);
       videoSwapTimeout = null;
       isRevealed = false;
+
+      if (isModeActive()) {
+        showPopupMessage('oh! ok, bye!', 1600)
+      }
 
       gsap.to(target.scale, {
         x: 1, y: 1, z: 1,
@@ -471,8 +612,16 @@ function interactions() {
     // Click only works after isRevealed is true
     target.addEventListener('click', () => {
       if (!isModeActive() || !isRevealed) return
+
+      const isUnlocked = requestUnlock(name, unlockCode, lockedMessage)
+      if (!isUnlocked) {
+        return
+      }
+
       overlay.classList.add('active');
-      overlayVideo.play();
+      if (overlayVideo) {
+        overlayVideo.play();
+      }
     });
 
     interactionManager.add(target);
